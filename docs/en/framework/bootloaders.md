@@ -61,6 +61,7 @@ and doesn't depend on code execution in the `init` and `boot` methods of other b
 In this method, you can add initialization callbacks, configure container bindings if this does not require 
 access to the application configuration.
 
+Here is the example:
 ```php
 use Spiral\Boot\AbstractKernel;
 use Spiral\Boot\Bootloader\Bootloader;
@@ -76,29 +77,30 @@ final class QueueBootloader extends Bootloader
     }
 
     public function init(
-        EnvironmentInterface $env, 
-        AbstractKernel $kernel
+        EnvironmentInterface $env
     ): void {
+        // Sets default values for the QueueConfig configuration group
         $this->config->setDefaults(
+            // See "Config Objects" documentation how to create a Config class
             QueueConfig::CONFIG,
             [
+                // The default queue connection to use is either the value specified in the QUEUE_CONNECTION
+                // environment variable or 'sync' if the environment variable is not set
                 'default' => $env->get('QUEUE_CONNECTION', 'sync'),
                 // ...
             ]
         );
-        
-        $kernel->booting(function () {
-            // ...
-        });
     }
 }
+
 ```
 
 ### Boot
 
 This method is executed *after* executing method `init` in all bootloaders. It can be used if you need the result 
-of the `init` methods in all bootloaders. For example, compiled configuration files.
+of the `init` methods in all bootloaders. 
 
+Here is the example:
 ```php
 use Spiral\Boot\Bootloader\Bootloader;
 use Spiral\Config\ConfiguratorInterface;
@@ -108,11 +110,11 @@ final class SessionBootloader extends Bootloader
 {
     public function boot(
         ConfiguratorInterface $config,
-        CookiesBootloader $cookies
+        SessionHandler $handler
     ): void {
         $session = $config->getConfig(SessionConfig::CONFIG);
 
-        $cookies->whitelistCookie($session['cookie']);
+        $handler->setOptions($session['options']);
     }
 }
 ```
