@@ -1,10 +1,8 @@
 [
   {
-    "title": "Overview",
+    "title": "Prologue",
     "links": {
-      "readme": "Table of Contents",
-      "about/spiral": "About Framework",
-      "about/contributing": "Contributing",
+      "about/contributing": "Contribution Guide",
       "about/semver": "Versioning",
       "license": "LICENSE"
     }
