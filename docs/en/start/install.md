@@ -42,7 +42,7 @@ Installation
 --------
 
 ```bash
-composer create-project spiral/app
+composer create-project spiral/installer my-app
 ```
 
 > **Note**
@@ -75,5 +75,6 @@ The application will be available on `http://localhost:8080`.
 
 Check other skeleton builds:
 
+- https://github.com/spiral/app - 
 - https://github.com/spiral/app-cli - minimal CLI build
 - https://github.com/spiral/app-grpc - GRPC specific build (no views, HTTP)
