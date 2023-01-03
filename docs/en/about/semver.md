@@ -12,7 +12,7 @@ https://github.com/spiral/framework/releases
 |---------|--------------|----------------------------|
 | 0.*     | Nov 2013     | Dec 2017                   |
 | 1.*     | Apr 2017     | Dec 2019                   |
-| 2.*     | May 2019     | Dec 2022                   |
+| 2.*     | May 2019     | Sep 2022                   |
 | 3.*     | Sep 2022     | Dec 2024                   |
 
 ## Language Version Support
