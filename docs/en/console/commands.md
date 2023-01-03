@@ -9,7 +9,7 @@ In this documentation, we will walk you through the process of creating a new co
 
 Before you can create a new command you will need to have a working Spiral-based application.
 
-## Create the Command
+## Create a Command
 
 To create a new command, you can use the following template as a starting point:
 
