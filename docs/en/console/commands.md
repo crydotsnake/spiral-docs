@@ -1,65 +1,21 @@
-# Console - User Commands
+# Creating Console Commands
 
-You can add new console commands to your application or register plugin commands using bootloaders. By default, the
-Console component is configured to automatically find commands in the `app/src` directory.
+## Introduction
 
-To add a new `symfony/console` based Command, simply drop it into your application.
+Creating commands in the Spiral Framework is a straightforward process that allows you to extend the functionality of your application and provide additional functionality to your users. 
+In this documentation, we will walk you through the process of creating a new command from start to finish.
 
-## Command class
+## Prerequisites
 
-To create a new command, you can either extend `Symfony\Component\Console\Command\Command` or `Spiral\Console\Command`
-which provides some syntax sugar.
+Before you can create a new command you will need to have a working Spiral-based application.
+
+## Create the Command Class
+
+To create a new command class, you can use the following template as a starting point:
 
 ```php
 use Spiral\Console\Command;
 
-class MyCommand extends Command
-{
-    const NAME        = 'my:command';
-    const DESCRIPTION = 'This is my command';
-
-    const ATTRIBUTES = [];
-    const OPTIONS    = [];
-
-    /**
-     * Perform command
-     */
-    protected function perform(): int
-    {
-        // do something special...
-        return self::SUCCESS;
-    }
-}
-```
-
-Use constants `NAME` and `DESCRIPTION` to give a name to your Command. You can invoke it now using:
-
-```bash
-php app.php my:command 
-```
-
-## Arguments and Options
-
-Spiral's `Command` class makes it easy to define necessary arguments and options:
-
-```php
-const ARGUMENTS = [
-    ['argument', InputArgument::REQUIRED, 'Argument name.']
-];
-    
-const OPTIONS = [
-    ['option', 'c', InputOption::VALUE_NONE, 'Some option.']
-];
-```
-
-To get user's data via arguments and/or options, you can make use of `$this->argument("argName")` or
-`$this->option("optName")`.
-
-## Signature
-
-An alternative way to declare the `name` of the command, `arguments` and `options` is the constant `SIGNATURE`.
-
-```php
 class SomeCommand extends Command 
 {
     protected const SIGNATURE = 'check:http {url : Site url} {--S|skip-ssl-errors : Skip SSL errors}';
@@ -69,13 +25,15 @@ class SomeCommand extends Command
         $url = $this->argument('url');
         $skipErrors = $this->option('skip-ssl-errors');
 
-        // ...
+        return self::SUCCESS;
     }
 }
 ```
 
-All user supplied arguments and options are wrapped in curly braces. In the following example, the command defines one 
-required argument: `url`.
+In this example, the `SIGNATURE` constant defines two arguments: a required argument named `url`, with the description `"Site url"`, and an optional boolean option named `skip-ssl-errors`, with the short version `S` and the description `"Skip SSL errors"`.
+
+The `perform` method is where the main logic of the command is implemented. 
+This method should contain the code that is needed to complete the task of the command.
 
 You may also make arguments optional or define default values for arguments:
 
@@ -105,19 +63,53 @@ If you would like to define `arguments` or `options` to expect multiple input va
 'check:http {url*}'
 ```
 
-## Perform method
+## Invoke the Command
 
-You can put your user code into the `perform` method. The `perform` supports method injection and provides `$this->input`
-and `$this->output` properties to work with user input.
+To invoke the command, you can use the command line to send a request to the console component. 
+The command line syntax will depend on the name and arguments of your command.
+
+For example, to invoke the `MyCommand` command, you can use the following command:
+
+```bash
+php app.php check:http google.com --S
+```
+
+## Arguments and Options
+
+Instead of `SIGNATURE` constant you also can use `ARGUMENTS` with `OPTIONS` in your command class.
+
+> **Note**
+> This constants will be deprecated since v4.0
 
 ```php
-protected function perform(MyService $service): int
+use Spiral\Console\Command;
+
+class SomeCommand extends Command 
 {
-    $this->output->writeln($service->doSomething());
-    
-    return self::SUCCESS;
+    const NAME = 'parse:category';
+    const DESCRIPTION = 'This is my command';
+
+    const ARGUMENTS = [
+        ['name', InputArgument::REQUIRED, 'Category name.']
+    ];
+        
+    const OPTIONS = [
+        ['silent', 's', InputOption::VALUE_NONE, 'Silent parse.']
+    ];
+
+    public function perform(): int
+    {
+        $name = $this->argument('name');
+        $silent = $this->option('silent');
+
+        return self::SUCCESS;
+    }
 }
 ```
+
+In this example, the `ARGUMENTS` constant defines a single required argument named `name`, with the description `"Category name."`.
+The `OPTIONS` constant defines a single option named `silent`, which is a boolean option (no value is required). 
+The `s` value is the short version of the option.
 
 ## Helper Methods
 
