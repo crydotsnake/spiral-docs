@@ -9,9 +9,9 @@ In this documentation, we will walk you through the process of creating a new co
 
 Before you can create a new command you will need to have a working Spiral-based application.
 
-## Create the Command Class
+## Create the Command
 
-To create a new command class, you can use the following template as a starting point:
+To create a new command, you can use the following template as a starting point:
 
 ```php
 use Spiral\Console\Command;
