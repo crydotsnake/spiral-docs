@@ -1,44 +1,45 @@
 # Framework - Container and Factories
 
-The framework includes a set of interfaces and components intended to simplify dependency injection and object
-construction in your application.
-
-> **Note**
-> Container implementation is fully compatible with [PSR-11 Container](https://github.com/php-fig/container).
+The Spiral Framework provides a powerful tool for managing class dependencies and performing dependency injection. The
+Spiral Framework container is fully compatible with the [PSR-11](https://www.php-fig.org/psr/psr-11/), which defines a
+standard interface for containers. This means that the container can be used with any other application or library that
+adheres to the PSR-11 standard.
 
 ## PSR-11 Container
 
-You can always access the container directly in your code by requesting `Psr\Container\ContainerInterface`:
+You can access the container directly in your code by requesting an instance of `Psr\Container\ContainerInterface`:
 
 ```php
 use Psr\Container\ContainerInterface;
 
-class HomeController
-{
-    public function index(ContainerInterface $container): void
+final class UserService
+{   
+    public function __construct(
+        private readonly ContainerInterface $container
+    ) {}
+
+    public function store(User $user): void
     {
-        dump($container->get(App\App::class));
+        $em = $this->container->get(EntityManagerInterface::class);
+        $em->persist($user);
     }
+    
+    // ...
 }
 ```
 
 ## Dependency Injection
 
-Spiral supports both method and constructor injections for your classes:
+The container supports both method and constructor injection:
 
 ```php
-class UserMailer
+final class UserController
 {
-    protected Mailer $mailer;
-
-    public function __construct(Mailer $mailer)
+    public function verify(int $userId, Mailer $mailer): void
     {
-        $this->mailer = $mailer;
-    }
-    
-    public function do(): void
-    {
-        $this->mailer->sendMail(...);
+        // Load user from database ...
+        
+        $this->mailer->sendMail(new SendVerificationEmail($user));
     }
 }
 ```
@@ -46,12 +47,13 @@ class UserMailer
 The `Mailer` dependency will be automatically delivered by the container (auto-wiring).
 
 > **Note**
-> that your controllers, commands, and jobs support method injection.
-> Auto-wiring supports union types, variadic arguments, referenced parameters, and default object values.
+> Controllers, commands, and jobs support method injection. Auto-wiring supports union types, variadic arguments, 
+> referenced parameters, and default object values.
 
 ## Configuring Container
 
-You can configure a container by creating a set of bindings between aliases or interfaces to concrete implementations.   
+You can configure a container by creating a set of bindings between aliases or interfaces to concrete
+implementations.   
 Use [Bootloaders](../framework/bootloaders.md) to define bindings.
 
 We can either use `Spiral\Core\BinderInterface` or `Spiral\Core\Container` to configure the application container.
@@ -217,7 +219,8 @@ public function makeClass(FactoryInterface $factory): MyClass
 
 ## ResolverInterface
 
-If you want to resolve method arguments to dynamic target (i.e., controller method), use `Spiral\Core\ResolverInterface`:
+If you want to resolve method arguments to dynamic target (i.e., controller method),
+use `Spiral\Core\ResolverInterface`:
 
 ```php
 abstract class Handler
@@ -251,7 +254,7 @@ class MyHandler extends Handler
 }
 ```
 
-The default implementation of `ResolverInterface` supports Union types. One of the available dependencies of 
+The default implementation of `ResolverInterface` supports Union types. One of the available dependencies of
 the needed type will be passed:
 
 ```php
@@ -335,9 +338,9 @@ dump($args);
 
 ### Arguments validation
 
-In some cases, you may want to validate a function or method arguments. To do this, you can use the public 
-`validateArguments` method, in which you need to pass `ReflectionMethod` or `ReflectionFunction` and 
-`array of arguments`. If you received the arguments using the `resolveArguments` method and didn't pass `false` in the 
+In some cases, you may want to validate a function or method arguments. To do this, you can use the public
+`validateArguments` method, in which you need to pass `ReflectionMethod` or `ReflectionFunction` and
+`array of arguments`. If you received the arguments using the `resolveArguments` method and didn't pass `false` in the
 `$validate` parameter, they don't need additional validation. They will be checked automatically.
 If the arguments are not valid, `Spiral\Core\Exception\Resolver\InvalidArgumentException` will be thrown.
 
@@ -421,14 +424,16 @@ class MyController
 }
 ```
 
-In the provided example, the container will attempt to give the instance of `OtherClass` by automatically constructing it.
+In the provided example, the container will attempt to give the instance of `OtherClass` by automatically constructing
+it.
 However, `SomeInterface` would not be resolved unless you have proper binding in your container.
 
 ```php
 $container->bind(SomeInterface::class, SomeClass::class); 
 ```
 
-Please note that the container will try to resolve *all* constructor dependencies (unless you manually provide some values).
+Please note that the container will try to resolve *all* constructor dependencies (unless you manually provide some
+values).
 It means that all class dependencies must be available, or parameter must be declared as optional:
 
 ```php
@@ -461,7 +466,8 @@ protected function index(Database $primary, Database $secondary): void
 > **Note**
 > It's where `primary` and `secondary` are database names.
 
-Implement `Spiral\Core\Container\InjectorInterface` to create an injection factory and define a class responsible for such
+Implement `Spiral\Core\Container\InjectorInterface` to create an injection factory and define a class responsible for
+such
 injections:
 
 ```php
@@ -596,7 +602,7 @@ Using such an approach, you can perform complex computations only once and rely 
 
 ## Replacing a container instance
 
-In some cases, you might want to replace `container instance` in the application. You can do this when you create 
+In some cases, you might want to replace `container instance` in the application. You can do this when you create
 an application instance.
 
 ```php
